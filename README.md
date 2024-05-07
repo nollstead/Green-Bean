@@ -5,7 +5,7 @@
 
 The Green Bean is a breakout board based on the STM32G473CBT6 microcontroller.  It's designed to be a small, powerful and adaptable platform for STM32-based development.  It comes with everything you need for basic functionality (power inputs, external crystals, USB connector, an LED to blink and even an SWD interface to upload your code) as well as headers exposing all remaining pins to connect to external components.  Want to take it further, just create a basic shield that connects to those pins and the sky is the limit.
 
-### Features
+## Features
 - 16MHz external high speed crystal
 - 32.768MHz external low speed crytal
 - Powered by either a USB-C connecter or a 1C LiPo battery.  Schottky diodes included to provide reverse voltage protection.
@@ -21,25 +21,33 @@ The Green Bean is a breakout board based on the STM32G473CBT6 microcontroller.  
 - Exposed 3.3v pins.  Note these are output only (and protected via a Schottky diode)
 - All unused pins exposed via standard 2.54mm female headers.  Connect to external components via jumper wires or make a shield 
 
-### Protocol Support
+## Protocol Support
 - USB 2.0 full speed
 - USART:  Available on pins PA2 (Tx), PA3 (Rx) and Pa4 (Clk)
 - I2c:    Available on 4-pin header
 - SPI:    Available on 8-pin header
 - User LED:  Available on pin PB12
 - CAN
-- IR
+- Serial Wire Debugger (SWD) via pads for a tag-connect TC2030-IDC-NL adapter.  
 
-### Getting Started
+
+
+## Getting Started
 
 ### Powering the green bean
 
-#### Initial Setup (STM32CubeIDE)
-
-### Blinky
+### Initial Setup (STM32CubeIDE)
 
 ### Uploading Code
 
+There are a number of methods to upload code to the green bean.  
 
+- USB DFU Mode:  Details
+- Tag-Connect:  Details
+- Arduino IDE:  Details
+
+
+
+  
 
 
