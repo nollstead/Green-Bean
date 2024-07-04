@@ -31,7 +31,6 @@ The Green Bean is a breakout board based on the STM32G473CBT6 microcontroller.  
 - Serial Wire Debugger (SWD) via pads for a tag-connect TC2030-IDC-NL adapter.  
 
 
-
 ## Getting Started
 
 ### Powering the green bean
