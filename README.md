@@ -2,7 +2,7 @@
 
 ![image](https://github.com/nollstead/Green-Bean/assets/13612518/946539af-7d3a-4dbd-b837-e23c8881a81c)
 
-The Green Bean is a breakout board based on the STM32G473CBT6 microcontroller.  It's designed to be a small, powerful and adaptable platform for STM32-based development.  It comes with everything you need for basic functionality (power inputs, external crystals, USB connector, an LED to blink and even an SWD interface to upload your code) as well as headers exposing all remaining pins to connect to external components.  Want to take it further, just create a basic shield that connects to those pins and the sky is the limit.
+The Green Bean is a breakout board based on the STM32G473RCT6 microcontroller.  It's designed to be a small, powerful and adaptable platform for STM32-based development.  It comes with everything you need for basic functionality (power inputs, external crystals, USB connector, an LED to blink and even an SWD interface to upload your code) as well as headers exposing all remaining pins to connect to external components.  Want to take it further, just create a basic shield that connects to those pins and the sky is the limit.
 
 ## Features
 - 25MHz external high speed crystal
@@ -35,22 +35,10 @@ The Green Bean is a breakout board based on the STM32G473CBT6 microcontroller.  
 
 The following links provide everything you need to know to get started using your Green Bean, including powering options, initial configuration and your first sketch.
 
-- Powering your Gr33n Bean
-- Software and Basic Configuration
+- Powering your Green Bean
+- Software and Initial Configuration
 - Writing your first program - Blinky!
 - Uploading firmware
-
-### Powering the green bean
-
-### Initial Setup (STM32CubeIDE)
-
-### Uploading Code
-
-There are a number of methods to upload code to the green bean.  
-- USB DFU Mode:  The simplest, but least powerful, method is to use the built-in Device Firmware Update (DFU) bootloader.  With this method you'll be able to upload compiled code but you won't have debugging capabilities (similar to an Arduino).  1.  Compile your code in your preferred IDE and obtain a firmware file.  2.  Place the green bean in DFU mode by holding the Boot0 button then pressing RESET (then release both).  3.  Identify USB virtual comport in device manager.  4.  Upload code using STM32CubeProgrammer Utility.
-   
-
-- Tag-Connect:  Details
 
 
 
