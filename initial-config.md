@@ -102,4 +102,7 @@ Note:  You may notice that we're using the internal resonator to drive the USB i
 
 ![image](/images/Clock.png)
 
+Click save and the IDE will take the configuration changes you've set and generate the required code for you.  At this point your Green Bean project is setup with the basics needed to start coding
+
+Next:  [Writing your first program - Blinky!](/writing-your-first-program.md)
 
