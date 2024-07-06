@@ -1,6 +1,6 @@
 # Introducing the Green Bean
 
-![image](/image.png)
+![image](/images/GreenBean.png)
 
 The Green Bean is a breakout board based on the STM32G473RCT6 microcontroller.  It's designed to be a small, powerful and adaptable platform for STM32-based development.  It comes with everything you need for basic functionality (power inputs, external crystals, USB connector, an LED to blink and even an SWD interface to upload your code) as well as headers exposing all remaining pins to connect to external components.  Want to take it further, just create a basic shield that connects to those pins and the sky is the limit.
 
@@ -25,7 +25,7 @@ The Green Bean is a breakout board based on the STM32G473RCT6 microcontroller.  
 - USART
 - I2C:    Mirrored on 4-pin header and Qwiic connector
 - SPI:    Available on 8-pin header
-- User LED:  Available on pin PB12
+- User LED:  Available on pin PB10
 - CAN
 - Infrared (IR) Out: 
 - Serial Wire Debugger (SWD) via pads for a tag-connect TC2030-IDC-NL adapter.  
