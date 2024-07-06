@@ -1,3 +1,5 @@
+# Initial Configuration
+
 In this section we'll cover initial configurations required for setting up a development project using the Green Bean.  This includes setting up the Integrated Development Environment (IDE) as well as the basic initial configurations required to write your first program.  
 
 ## Initial Project Creation

@@ -37,7 +37,7 @@ The following links provide everything you need to know to get started using you
 
 - [Powering your Green Bean](/Powering%20your%20Green%20Bean.md)
 - [Initial Configuration](/initial-config.md)
-- [Writing your first program - Blinky!](/writing-your-first-program.md)
+- [Writing your first program - Hello Blinky!](/writing-your-first-program.md)
 - [Uploading firmware](/Uploading%20Firmware.md)
 
 

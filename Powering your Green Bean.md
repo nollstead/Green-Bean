@@ -1,3 +1,5 @@
+# Powering your Green Bean
+
 The Green Bean can be powered via a USB-C connector, a LiPo battery or the exposed VIN (Voltage In) pin.  When powering your board keep the following in mind:
 
 ### General
@@ -15,6 +17,6 @@ The Green Bean can be powered via a USB-C connector, a LiPo battery or the expos
 
 ### LiPo
 When choosing a LiPo battery to power the Green Bean, some considerations should be made
-- Ensure that the battery uses a 2m JST-PH connector
+- Ensure that the battery uses a 2mm JST-PH connector
 - Confirm the polarity orientation.  While the Green Bean includes reverse polarity protection, it's important for the positive and negative wire to be property oriented to power the board.  When connected the positive (red) wire should line up with the + symbol on the board and the negative (black) wire should line up with the - symbol.
 - Examples of LiPo batteries with the correct polarity can be found [here](https://www.amazon.com/gp/product/B09G2S88Q3/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&th=1) and [here](https://www.amazon.com/gp/product/B09BYVNH2N/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1).  
