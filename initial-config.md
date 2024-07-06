@@ -11,33 +11,39 @@ Open STM32CubeIDE and select File->New->STM32 Project.  From there, enter stm32g
 
 Open the .ioc file and make sure you're on the Pinout & Configuration Tab.  
 
-### Expand System Core then click on RCC
+### Configure Crystal Pins
 The Green Bean includes two external crystals, a 32.768MHz low speed external crystal and a 25MHz high speed external crystal.  Here we'll tell the system that they exist and we'll define their values later.
 
+- Expand System Core then click on RCC
 - Set High Speed Clock (HSE) to Crystal\Ceramic Resonator
 - Set Low Speed Clock (LSE) to Crystal\Ceramic Resonator
 
 ![image](/images/RCC.png)
 
 
-### Expand System Core then click on SYS
+### Configure Debugger Pins
 The Green Bean includes a Tag-Connect header for uploading firmware and debugging using a Serial Wire Debugger (SWD).  Here we configure those pins.  
+
+- Expand System Core then click on SYS
 - Set Debug to Trace Asynchronous Sw
 
 ![image](/images/SYS.png)
 
-Note:  Technically we can get away with setting the Debug to 'Serial Wire' but 'Trace Asynchronous Sw' also enables the Serial Wire Output (SWO) pin - which can be useful.
+Note:  Technically we can get away with setting the Debug option to 'Serial Wire' but 'Trace Asynchronous Sw' also enables the Serial Wire Output (SWO) pin - which can be useful.  Since it's wired on the board we'll go ahead and choose that option.
 
-### Expand Timers then click on RTC
-While we won't necessarily be using the real-time clock very often, enabling it here allows us to configure the low speed crystal value later.
+### Configure Real Time Clock
+While we won't likely be using the real-time clock very often, enabling it here allows us to configure the low speed crystal value later.
+
+- Expand Timers then click on RTC
 - Check 'Activate Clock Source'
 
 ![image](/images/RTC.png)
 
-### (Optional) Expand Connectivity then click on SPI1
+### (Optional) Configure SPI1 Pins
 
-The Green Bean includes an 8-pin SPI header.  The layout is designed for use with an NRF24L01 transceiver though it can be used for any SPI device.  While this only needs to be configured if you plan to use it, it's convenient to reserve those pins so we have options later - so we'll go ahead and configure it now.
+The Green Bean includes an 8-pin SPI header.  The layout is designed for use with an NRF24L01 transceiver though it can be used for any SPI device.  While this only needs to be configured if you plan to use it, it's convenient to reserve those pins so that we don't use them for something else in case we decide to add an NRF24L01 module later - so we'll go ahead and configure it now.
 
+- Expand Connectivity then click on SPI1
 - Set Mode to 'Full-Duplex Master'
 - Set Data Size to 8-Bits
 - Set Prescaler to 32
@@ -46,13 +52,54 @@ The Green Bean includes an 8-pin SPI header.  The layout is designed for use wit
 
 ![image](/images/SPI1.png)
 
+### (Optional) Configure USB
+
+While not strictly required, we'll go ahead and enable USB support as a full speed virtual COM port device.
+
+- Expand Connectivity then click on USB
+- Check Device (FS)
+- Expand 'Middleware and Software Packs' then click on USB_DEVICE
+- set Class For FS IP to 'Communication Device Class (Virtual Port Com)'
+
+![image](/images/USBVCP.png)
+
+## Pinout
+
+Now that the main basic components have been configured, you'll see those pins selected on the pinout view on the right.  Before we move on to configuring the clock we'll make a few changes
+
+- Click PB10 and set to GPIO_Output
+- Right-Click on PB10, select 'Enter User Label' and rename to LED
+- Click on PG10 and set to GPIO_Input
+- Right-Click on PG10, select 'Enter User Label' and rename to PG10-NRST
+- Click on PB8 and set to GPIO_Input
+- Right-Click on PB8, select 'Enter User Label' and rename to PB8-BOOT0
+- Click on PA1 and set to GPIO_Output
+- Right-Click on PA1, select 'Enter User Label' and rename to CE
+- Click on PA2 and set to GPIO_Output
+- Right-Click on PA2, select 'Enter User Label' and rename to CSN
+- Click on PB9 and set to GPIO_EXTI9
+- Right-Click on PB9, select 'Enter User Label' and rename to IRQ
+
+
+![image](/images/pinout.png)
 
 
 ## Clock Configuration
 
+Now that our pins pins are configured, our final step is to configure the clocks. While the STM32G473 MCU has both internal high speed and low speed resonators they're not very inaccurate.  So the Green Bean includes external crystals that can be used instead.  Earlier we enabled this functionality but here we'll configure their values.  
+
+As mentioned above, the Green Bean includes two crystals, one for the low speed clock and 
+
+- On the top menu, click on the Clock Configuration tab.  If you get a clock configuration error you can ignore that and close it for now as we'll setup everything manually.
+- Set RTC Clock Mux to LSE
+- Set HSE input frequency to 25 (MHz)
+- Set PLL Source Mux to HSE
+- Set System Clock Mux to PLLCLK
+- Set CK48 Clock Mux to HSI48
+- Set HCLK to 170MHZ
+
+Note:  You may notice that we're using the internal resonator to drive the USB instead of the PLLQ.  The reason is that we chose the 25MHz high speed crystal value so that we could achieve the highest possible system speed (170MHz), however, USB needs to run at 48MHz and there is no combination that will start at 25MHz and reach 48MHz.  
+
 ![image](/images/Clock.png)
 
-## Pinout
-
-![image](/images/pinout.png)
 
