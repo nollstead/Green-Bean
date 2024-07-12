@@ -15,7 +15,7 @@ The nextion display communicates via a serial connection, so the first step is t
 
 To easily communicate with the Nextion we'vRe included a simple library.  Here we'll import that library into your main code.
 
-- Download the [nextion.c](/Nextion/nextion.c) and [nextion.h](/Nextion/nextion.h) files to your computer.  
+- Download the [nextion.c](/examples/Nextion/nextion.c) and [nextion.h](/examples/Nextion/nextion.h) files to your computer.  
 - Open nextion.c in a text editor and copy the contents to the clipboard
 - In your STM32CubeIDE project, navigate to Core\Src in the Project Explorer
 - Right-Click and select New->Src
