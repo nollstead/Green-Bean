@@ -44,7 +44,7 @@ The following links provide everything you need to know to get started using you
 
 Below are a few simple examples, along with code as needed, to help you get started
 
-- [Writing to a Nextion Display](/Nextion/nextion.md)
+- [Writing to a Nextion Display](/examples/Nextion/nextion.md)
 
 
 
