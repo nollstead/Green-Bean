@@ -45,6 +45,8 @@ The following links provide everything you need to know to get started using you
 Below are a few simple examples, along with code as needed, to help you get started
 
 - [Writing to a Nextion Display](/examples/Nextion/nextion.md)
+- [Analog-to-Digital (ADC) Conversion - Reading a Joystick](/examples/ADC/ADC.md)
+
 
 
 
