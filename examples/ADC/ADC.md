@@ -1,6 +1,6 @@
 # Analog-to-Digital (ADC) Conversion
 
-In this example, we'll learn how to configure your green bean to convert an analog input to a digital value.  For the analog source we'll use a small joystick which has two analog outputs (X and Y positions) as well as a digital output representing a button press.  Examples of inexpensive joysticks can be found here and here.
+In this example, we'll learn how to configure your green bean to convert an analog input to a digital value.  For the analog source we'll use a small [Dual-Axis XY Joystick with Push Button](https://www.addicore.com/products/dual-axis-xy-joystick-with-push-button?variant=45731914842429), which has two analog outputs (X and Y positions) as well as a digital output representing a button press.
 
 ## Configure a timer
 
@@ -21,10 +21,26 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
   - Set Trigger Event Selection TRGO to Update Event
   - Click on NVIC Settings and check TIM2 global interrupt.
 
-## Configure ADC
+## Connect Joystick and Configure ADC
 
+Now that we've configured the timer we'll decide which ports we want to configure for the joystick.  We'll pick two pins on the same analog controller and one digital pin.
 
-## Connect Joystick
+- In thr right Pinout view pane
+  - Click on PC0, select ADC1_IN6 and right-click then rename to JOYX
+  - Click on PC1, select ADC1_IN7 and right-click then rename to JOYY
+  - Click on PC2, select GPIO_Output and right-click then rename to JOYButton
+- Under the Analog section click on ADC1
+  - In the Mode section change change IN6 and IN7 to Single-ended
+  - In Configuration/Parameter Settings
+    - Set resolution to ADC 8-bit resolution
+
+- Wire in the joystick as follows
+  - SW on the joystick goes to PC2 on the Green Bean
+  - VRX on the joystock goes to PC0 on the Green Bean
+  - VRY on the joystock goes to PC1 on the Green Bean
+  - +5v on the joystick goes to 5V on the Green Bean
+  - GND on the joystick goes to any GND on the Green Bean
+
 
 ## Write values
 
