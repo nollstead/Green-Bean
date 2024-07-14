@@ -10,9 +10,6 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
 
 <p align="center">$T_{out}={(ARR+1)(PSC+1) \over F_{clk}}$</p>
 
-
-
-
  Since Timer2 has a 32-bit autoreload register it can hold a big value, we'll use that and make our calculation a bit easier and set the prescaler to 0.  Substituting 0.2 seconds for $T_{out}, 0 for PSC and 170MHz for $F_{clk}$ we can rearrange the equation and solve for ARR to get 42,500,000
 
 - In STM32CubeIDE open your .ioc file, go to the Timers section and select TIM2
@@ -42,8 +39,14 @@ Now that we've configured the timer we'll decide which ports we want to configur
   - Click on PC0, select ADC1_IN6 and right-click then rename to JOYX
   - Click on PC1, select ADC1_IN7 and right-click then rename to JOYY
   - Click on PC2, select GPIO_Output and right-click then rename to JOYButton
+
+<p align="center"><img src="/examples/ADC/images/ADCPins.png"</p>
+
 - Under the Analog section click on ADC1
   - In the Mode section change change IN6 and IN7 to Single-ended
+
+<p align="center"><img src="/examples/ADC/images/ADCMode.png"</p>
+
   - In Configuration/Parameter Settings
     - Set resolution to ADC 8-bit resolution
 
