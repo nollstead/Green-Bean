@@ -72,9 +72,9 @@ There are several options for performing ADC conversions.  In our example, we'll
 
 #### 3. Configure ADC Parameters
 
-Now we'll tell the ADC where to obtain the analog data, in which order we want to sample (rank), how to convert it and how often we want to sample the data.  Since we're reading joystick values, which inherently range from 0 to 255, we'll tell it to do an 8-bit conversion.  This saves us from having to map the results into that range via code (as is typically done with an Arduino using the map() function).  We'll also tell it to let us know, by firing an event (we'll see that later), when both conversions are complete.  We also set the sampling time arbitrarily to something in the middle of the range:  Lower values are quicker but less accurate, higher values take more time - although in this case the sampling time doesn't make much difference.
+Now we'll tell the ADC where to obtain the analog data, in which order we want to sample (rank), how to convert it and how samples to take for each conversion.  Since we're reading joystick values, which inherently range from 0 to 255, we'll tell it to do an 8-bit conversion.  This saves us from having to map the results into that range via code (as is typically done with an Arduino using the **map()** function).  We'll also tell it to let us know, by firing an event (we'll see that later), when both conversions are complete.  We also set the sampling time arbitrarily to something in the middle of the range:  Lower values are quicker but less accurate, higher values take more time - although in this case the sampling time doesn't make much difference.
 
-Note the order that these settings are made is important - as some options are not available until others are set
+Note that the order that these settings are made is important - as some options are not available until others are set
 
   - click on the parameter settings tab
   - Set resolution to ADC 8-bit resolution
@@ -95,59 +95,58 @@ Finally we'll wire up the shared ADC1/ADC2 global interrupt
 
 ## Code
 
-Now that the timer and ADC are configured, close the .ioc file and let it auto-generate that code.  If you were to run this code now it wouldn't do much, as all we've done is setup some initial parameters and variables and had that code auto-generated.  Now we need to add some code to use these. 
-
-We'll create a buffer of size 2 (for x and y) to store the data (that's the DMA function at work) as well as additional variables to hold the individual values.  
+Now that the timer and ADC are configured, close the .ioc file and let it auto-generate that code.  If you were to run this code now it wouldn't do much, as all we've done is setup some variables and initial parameters.  Now we need to add some code to make use of these.We'll create a buffer of size 2 (for x and y) to store the data (that's the DMA function at work) as well as additional variables to hold the individual values.  
 
 - Open your main.c file.  If you have any code from a previous example that flashes the LED either remove or comment that out as we'll be using the LED in this example for another purpose.
 
 - In the **USER CODE BEGIN PD** section declare a constant.  This will be used in a few places to define how many ADC conversions we want to do and set the size for a buffer to hold that data - so it's handy to declare it in one place in case you want to change it later.
 
-```c
-/* USER CODE BEGIN PD */
-#define ADC_BUF_SIZE 2
-```
+  ```c
+  /* USER CODE BEGIN PD */
+  #define ADC_BUF_SIZE 2
+  ```
 
 - In the **USER CODE BEGIN PV** section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use. 
 
-```c
-/* USER CODE BEGIN PV */
-uint8_t JoyX, JoyY, JoyButton;
-uint8_t AD_RES_BUFFER[ADC_BUF_SIZE];
-```
+  ```c
+  /* USER CODE BEGIN PV */
+  uint8_t JoyX, JoyY, JoyButton;
+  uint8_t AD_RES_BUFFER[ADC_BUF_SIZE];
+  ```
 
 - In the **USER CODE BEGIN 2** section we need to add some code to initialize the ADC and start the timer and DMA process.  We'll also set the LED to ON - this is optional but gives us a visual indication that this part of the code ran (and if it's not blinking later we know the ADC isn't working correctly).  We'll also insert a small 100ms delay after calibrating the ADC just to give it time to complete the calibration.  
-```c
-  /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);  			// Initialize to on
-  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);				// Initial ADC Calibration
-  HAL_Delay(100);														// Delay a bit to be sure it finishes
-  HAL_TIM_Base_Start(&htim2);											// Start timer
-  HAL_ADC_Start_DMA(&hadc1, (uint32_t *) AD_RES_BUFFER, ADC_BUF_SIZE);  // Enable DMA to memory buffer
-```
+
+  ```c
+    /* USER CODE BEGIN 2 */
+    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);  			// Initialize to on
+    HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);				// Initial ADC Calibration
+    HAL_Delay(100);														// Delay a bit to be sure it finishes
+    HAL_TIM_Base_Start(&htim2);											// Start timer
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t *) AD_RES_BUFFER, ADC_BUF_SIZE);  // Enable DMA to memory buffer
+  ```
 
 - Now we'll write a callback function for the ADC and place it in the **USER CODE BEGIN 0** section.  This function will be called automatically when the ADC completes it's work.  Remember that above we set the end of conversion selection to end of sequence of conversion.  That means that once both ADC conversions are complete it'll call this function, rather than after each conversion.  Here we're just toggling the LED pin - just to give us a visual indication that it's working - and pull the variables from the buffer to individual variables to be used later.
 
-```c
-/* USER CODE BEGIN 0 */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
-	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	JoyX = AD_RES_BUFFER[0];
-	JoyY = AD_RES_BUFFER[1];
-	JoyButton = !HAL_GPIO_ReadPin(JOYButton_GPIO_Port, JOYButton_Pin);  // Invert pin on read due to pull-up
-}
-```
+  ```c
+  /* USER CODE BEGIN 0 */
+  void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	  JoyX = AD_RES_BUFFER[0];
+	  JoyY = AD_RES_BUFFER[1];
+	  JoyButton = !HAL_GPIO_ReadPin(JOYButton_GPIO_Port, JOYButton_Pin);  // Invert pin on read due to pull-up
+  }
+  ```
 
 Note:  You'll notice that in the ConvCpltCallback function we're just storing values from the AD_RES_BUFFER into separate variables but not doing anything with them.  This is typical as you want the ADC conversion to run quickly (and repeatedly) - so don't include any logic in this function.  Its only purpose is to store the data in variables, so that we can use them later, and move on.  It does this every 200ms (per the timer we configured) so we don't want anything that takes a long time to run.  Also note that we're reading the JoyButton value here as well.  While that's not an analog conversion this seems like a reasonable place to update that variable so that we know that everything was read at the same time and we don't need to configure a separate timer to read that value.
 
 Finally we'll add some code to the main while loop to write the values to the USB.  If you already have code from a previous example that writes to the USB either delete or comment that out first, then add the following code to the **USER CODE BEGIN 3** section
 
-```c
+  ```c
     /* USER CODE BEGIN 3 */
 	  bufLen = snprintf(txBuf, 128, "JoyX:  %d\tJoyY: %d\tJoyButton: %d\r\n", JoyX, JoyY, JoyButton);
 	  CDC_Transmit_FS((uint8_t *) txBuf, bufLen);
 	  HAL_Delay(500);
-```
+  ```
 
 ## Connect joystick
 
@@ -171,7 +170,7 @@ Now it's time to check the conversion and read the values.  We'll do this two wa
 
 As before, once your code is uploaded and running you can connect to the Green Bean using a terminal emulator such as PuTTY.  You should see the joystick values printed every 1/2 second. 
 
-    ![image](/examples/ADC/images/USBOutput.png)
+  ![image](/examples/ADC/images/USBOutput.png)
 
 #### Via the debugger
 
