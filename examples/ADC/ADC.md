@@ -30,8 +30,7 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
 
 <p align="center"><img src="/examples/ADC/images/TIM2NVIC.png"</p>
 
-
-## Connect Joystick and Configure ADC
+## Configure ADC
 
 Now that we've configured the timer we'll decide which ports we want to configure for the joystick.  We'll pick two pins on the same analog controller and one digital pin.
 
@@ -47,16 +46,79 @@ Now that we've configured the timer we'll decide which ports we want to configur
 
 <p align="center"><img src="/examples/ADC/images/ADCMode.png"</p>
 
+  - In Configuration/DMA Settings
+    - Click Add
+    - Set DMA Request to ADC1
+    - Set Mode to Circular
+    - Set Memory to Byte
+
   - In Configuration/Parameter Settings
     - Set resolution to ADC 8-bit resolution
+    - Set Number of Conversion to 2
+    - Set End of Conversion Selection to End of sequence of conversion
+    - Set DMA Continuous Requests to Enabled
+    - Set External Trigger Conversion Source to Timer 2 Trigger Out Event
+    - Expand Rank 1, set channel to Channel 6 and Sampling Time to 247.5 Cycles
+    - Expand Rank 2, set channel to Channel 7 and Sampling Time to 247.5 Cycles
 
-- Wire in the joystick as follows
-  - SW on the joystick goes to PC2 on the Green Bean
-  - VRX on the joystock goes to PC0 on the Green Bean
-  - VRY on the joystock goes to PC1 on the Green Bean
-  - +5v on the joystick goes to 5V on the Green Bean
-  - GND on the joystick goes to any GND on the Green Bean
+ - On the NVIC Settings tab 
+   - Enable ADC1 and ADC2 global interrupt
 
+
+## Code
+
+Now that the timer and ADC are configured, close the .ioc file and let it auto-generate that code.  If you were to run this code it wouldn't do much, as all we've done is setup some initial parameters and variables (that code was auto-generated).  Now we need to add some code 
+
+- Open your main.c file.  If you have any code from a previous example that flashes the LED either remove or comment that out as we'll be using the LED in this example for another purpose.
+
+- In the USER CODE BEGIN PD section declare a constant.  This will be used in a few places to define how many ADC conversions we want to do and set the size for a buffer to hold that data.
+
+```c
+/* USER CODE BEGIN PD */
+#define ADC_BUF_SIZE 2
+```
+
+- In the USER CODE BEGIN PV section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use.
+
+```c
+/* USER CODE BEGIN PV */
+uint8_t JoyX, JoyY, JoyButton;
+uint8_t AD_RES_BUFFER[ADC_BUF_SIZE];
+```
+
+- In the USER CODE BEGIN 2 section we need to add some code to initialize the ADC and start the timer and DMA process.  We'll also set the LED to ON - this is optional but gives us a visual indication that this part of the code ran (and if it's not blinking later we know the ADC isn't working correctly).  We'll also insert a small 100ms delay after calibrating the ADC just to give it time to complete the calibration.  
+```c
+  /* USER CODE BEGIN 2 */
+  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);  			// Initialize to on
+  HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED);				// Initial ADC Calibration
+  HAL_Delay(100);														// Delay a bit to be sure it finishes
+  HAL_TIM_Base_Start(&htim2);											// Start timer
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t *) AD_RES_BUFFER, ADC_BUF_SIZE);  // Enable DMA to memory buffer
+```
+
+- Now we'll write a callback function for the ADC and place it in the USER CODE BEGIN 0 section.  This function will be called automatically when the ADC completes it's work.  Remember that above we set the end of conversion selection to end of sequence of conversion.  That means that once both ADC conversions are complete it'll call this function, rather than after each conversion.  Here we're just toggling the LED pin - just to give us a visual indication that it's working - and pull the variables from the buffer to individual variables to be used later.
+
+```c
+/* USER CODE BEGIN 0 */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
+	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	JoyX = AD_RES_BUFFER[0];
+	JoyY = AD_RES_BUFFER[1];
+	JoyButton = HAL_GPIO_ReadPin(JOYButton_GPIO_Port, JOYButton_Pin);	
+}
+```
+
+## Connect joystick and Test
+
+Now we're ready to test.  Wire in the joystick as follows (note that while the joystick we're using lists the power pin as +5V, our green bean natively runs at 3.3v - so we'll use that)
+
+| Joystick pin | Green Bean header pin |
+| :---: | ----------------------|
+| SW           | PC2                   |
+| VRX          | PC0                   |
+| VRY          | PC1                   |
+| +5V          | 3V3                   |
+| GND          | GND                   |
 
 ## Write values
 
