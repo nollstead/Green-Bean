@@ -12,7 +12,7 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
 
  Since Timer2 has a 32-bit autoreload register it can hold a big value, we'll use that and make our calculation a bit easier and set the prescaler to 0.  Substituting 0.2 seconds for $T_{out}, 0 for PSC and 170MHz for $F_{clk}$ we can rearrange the equation and solve for ARR to get 42,500,000
 
-- In STM32CubeIDE open your .ioc file, go to the Timers section and select TIM2
+- In STM32CubeIDE open your .ioc file, go to the Timers category and select TIM2
 - In the Mode section
   - Set Clock Source to Internal Clock
 
@@ -32,27 +32,53 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
 
 ## Configure ADC
 
-Now that we've configured the timer we'll decide which ports we want to configure for the joystick.  We'll pick two pins on the same analog controller and one digital pin.
+Now that we've configured the timer we need to configure the ADC controller. 
+
+#### 1. Enable pins
+
+We'll start by deciding which pins we want to use.  The Green Bean has five ADC's, each of which is divided into a number of channels.  Each pin has different options as to which ADC and channel it can work on.  For convenience, we'll pick two pins on the same analog controller
 
 - In the right Pinout view pane
   - Click on PC0, select ADC1_IN6 and right-click then rename to JOYX
   - Click on PC1, select ADC1_IN7 and right-click then rename to JOYY
-  - Click on PC2, select GPIO_Output and right-click then rename to JOYButton
+  - Click on PC2, select GPIO_Input and right-click then rename to JOYButton
 
 <p align="center"><img src="/examples/ADC/images/ADCPins.png"</p>
 
-- Under the Analog section click on ADC1
+Since the joystick we're using connects the button to GND when pressed, which is typical of most, we'll need to enable an internal pull-up resistor on the PC2 pin.  If you coming from an Arduino background this is similar to calling something line pinMode(JOYButton, INPUT_PULLUP).  We could code this manually in main.c but since we're here anyway we'll let the code generator do it for us.
+
+- Expand the System Core category and click on GPIO
+  - Click on PC2 and set set GPIO Pull-up/Pull-down to Pull-up
+
+![image](/examples/ADC/images/pullup.png)
+
+Each channel can be configured as either Single-Ended (where each conversion is done individually) or Differential (used to compare two different pins).  Since we are interested in obtaining individual values for the X and Y joystick, rather than compare those two values to each other, we'll set each channel to Single-Ended.
+
+- Under the Analog category click on ADC1
   - In the Mode section change change IN6 and IN7 to Single-ended
 
 <p align="center"><img src="/examples/ADC/images/ADCMode.png"</p>
 
-  - In Configuration/DMA Settings
+#### 2. Configure DMA
+
+There are several options for performing ADC conversions.  In our example, we'll configure it to automatically convert the results and store in a variable using Direct Memory Access (DMA).  DMA is a function of the microcontroller that works in the background to transfer data between a peripheral device (like our joystick) to a memory buffer.  
+
+
+  - In the Configuration section click on the DMA Settings tab
     - Click Add
     - Set DMA Request to ADC1
     - Set Mode to Circular
     - Set Memory to Byte
 
-  - In Configuration/Parameter Settings
+![image](/examples/ADC/images/DMA.png)
+
+#### 3. Configure ADC Parameters
+
+Now we'll tell the ADC where to obtain the analog data, in which order we want to sample (rank), how to convert it and how often we want to sample the data.  Since we're reading joystick values, which inherently range from 0 to 255, we'll tell it to do an 8-bit conversion.  This saves us from having to map the results into that range via code (as is typically done with an Arduino using the map() function).  We'll also tell it to let us know, by firing an event (we'll see that later), when both conversions are complete.  We also set the sampling time arbitrarily to something in the middle of the range:  Lower values are quicker but less accurate, higher values take more time - although in this case the sampling time doesn't make much difference.
+
+Note the order that these settings are made is important - as some options are not available until others are set
+
+  - click on the parameter settings tab
     - Set resolution to ADC 8-bit resolution
     - Set Number of Conversion to 2
     - Set End of Conversion Selection to End of sequence of conversion
@@ -61,24 +87,32 @@ Now that we've configured the timer we'll decide which ports we want to configur
     - Expand Rank 1, set channel to Channel 6 and Sampling Time to 247.5 Cycles
     - Expand Rank 2, set channel to Channel 7 and Sampling Time to 247.5 Cycles
 
- - On the NVIC Settings tab 
-   - Enable ADC1 and ADC2 global interrupt
+![image](/examples/adc/images/ParameterSettings.png)
+
+Finally we'll wire up the shared ADC1/ADC2 global interrupt
+
+ - Click on the NVIC settings tab and enable EDC1 and ADC2 global interrupt
+
+![image](/examples/adc/images/interrupt.png)
+
 
 
 ## Code
 
-Now that the timer and ADC are configured, close the .ioc file and let it auto-generate that code.  If you were to run this code it wouldn't do much, as all we've done is setup some initial parameters and variables (that code was auto-generated).  Now we need to add some code 
+Now that the timer and ADC are configured, close the .ioc file and let it auto-generate that code.  If you were to run this code now it wouldn't do much, as all we've done is setup some initial parameters and variables and had that code auto-generated.  Now we need to add some code to use these. 
+
+We'll create a buffer of size 2 (for x and y) to store the data (that's the DMA function at work).  As well as additional variables to hold the individual values.  
 
 - Open your main.c file.  If you have any code from a previous example that flashes the LED either remove or comment that out as we'll be using the LED in this example for another purpose.
 
-- In the USER CODE BEGIN PD section declare a constant.  This will be used in a few places to define how many ADC conversions we want to do and set the size for a buffer to hold that data.
+- In the USER CODE BEGIN PD section declare a constant.  This will be used in a few places to define how many ADC conversions we want to do and set the size for a buffer to hold that data - so it's handy to declare it in one place in case you want to change it later.
 
 ```c
 /* USER CODE BEGIN PD */
 #define ADC_BUF_SIZE 2
 ```
 
-- In the USER CODE BEGIN PV section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use.
+- In the USER CODE BEGIN PV section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use. 
 
 ```c
 /* USER CODE BEGIN PV */
@@ -104,21 +138,26 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 	HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	JoyX = AD_RES_BUFFER[0];
 	JoyY = AD_RES_BUFFER[1];
-	JoyButton = HAL_GPIO_ReadPin(JOYButton_GPIO_Port, JOYButton_Pin);	
+	JoyButton = !HAL_GPIO_ReadPin(JOYButton_GPIO_Port, JOYButton_Pin);  // Invert pin on read due to pull-up
 }
 ```
 
-## Connect joystick and Test
+Note:  You'll notice that in the ConvCpltCallback function we're just storing values from the AD_RES_BUFFER into separate variables but not doing anything with them.  This is typical as you want the ADC conversion to run quickly (and repeatedly) - so don't include any logic in this function.  Its only purpose is to store the data in variables, so that we can use them later, and move on.  It does this every 200ms (per the timer we configured) so we don't want anything that takes a long time to run.  Also note that we're reading the JoyButton value here as well.  While that's not an analog conversion this seems like a reasonable place to update that variable so that we know that everything was read at the same time and we don't need to configure a separate timer to read that value.
 
-Now we're ready to test.  Wire in the joystick as follows (note that while the joystick we're using lists the power pin as +5V, our green bean natively runs at 3.3v - so we'll use that)
+## Connect joystick
+
+Now we can connect our joystick according to the pins we configured above.  Wire in the joystick as follows (note that while the joystick we're using lists the power pin as +5V, our green bean natively runs at 3.3v - so we'll use that)
 
 | Joystick pin | Green Bean header pin |
-| :---: | ----------------------|
+| :---: | :---:|
 | SW           | PC2                   |
 | VRX          | PC0                   |
 | VRY          | PC1                   |
 | +5V          | 3V3                   |
 | GND          | GND                   |
 
-## Write values
+## Test
+
+
+
 
