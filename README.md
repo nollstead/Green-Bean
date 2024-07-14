@@ -40,12 +40,12 @@ The following links provide everything you need to know to get started using you
 - [Writing your first program - Hello Blinky!](/writing-your-first-program.md)
 - [Uploading firmware](/Uploading%20Firmware.md)
 
-## Examples 
+## Tutorials 
 
-Below are a few simple examples, along with code as needed, to help you get started
+Below are a few simple tutorials and examples, along with code as needed, to help you get started
 
-- [Writing to a Nextion Display](/examples/Nextion/nextion.md)
-- [Analog-to-Digital (ADC) Conversion - Reading a Joystick](/examples/ADC/ADC.md)
+- [Writing to a Nextion Display](/examples/Nextion/README.md)
+- [Analog-to-Digital (ADC) Conversion - Reading a Joystick](/examples/ADC/README.md)
 
 
 
