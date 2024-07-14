@@ -8,7 +8,10 @@ Rather than manually performing a single ADC conversion, we'll want our program 
 
 When we setup the green bean we set the main system clock to the maximum 170MHz, which is way too fast for our ADC conversions.  So we'll need to slow the timer clock back by configuring a combination of a clock prescaler and counter period (autoreload register).  The clock rate ($T_{out}$) can be calculated for a given autoreload register (ARR), clock prescaler (PSC) and clock frequency ($F_{clk}$) as follows:
 
- $T_{out}={(ARR+1)(PSC+1) \over F_{clk}}$
+<p align="center">$T_{out}={(ARR+1)(PSC+1) \over F_{clk}}$</p>
+
+
+
 
  Since Timer2 has a 32-bit autoreload register it can hold a big value, we'll use that and make our calculation a bit easier and set the prescaler to 0.  Substituting 0.2 seconds for $T_{out}, 0 for PSC and 170MHz for $F_{clk}$ we can rearrange the equation and solve for ARR to get 42,500,000
 
@@ -20,7 +23,7 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
 
 - In the Configuration section on the Parameter Settings tab
   - Set Prescaler to 0
-  - Set Counter Period (Auto Reload Register) to 42500000-1 (note we subtract 1 since the counter starts at 0)
+  - Set Counter Period (AutoReload Register) to 42500000-1 (note we subtract 1 since the counter starts at 0)
   - Set Trigger Event Selection TRGO to Update Event
 
 <p align="center"><img src="/examples/ADC/images/TIM2ParameterSettings.png"</p>
