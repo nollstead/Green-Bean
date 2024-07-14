@@ -6,7 +6,7 @@ In this example, we'll learn how to configure your green bean to convert an anal
 
 Rather than manually performing a single ADC conversion, we'll want our program to do this automatically at a defined interval - so we'll configure a timer that fires an event every 200 milliseconds.
 
-When we setup the green bean we set the main system clock to the maximum 170MHz, which is way too fast for our ADC conversions.  So we'll need to slow the timer clock back by configuring a combination of a clock prescaler and counter period (autoreload register).  The clock rate ($T_{out}$) can be calculated for a given autoreload register (ARR), clock prescaler (PSC) and clock frequency ($F_{clk}$) as follows:
+When we [setup the green bean](/initial-config.md) we set the main system clock to the maximum 170MHz, which is way too fast for our ADC conversions.  So, we'll need to slow the timer clock back by configuring a combination of a clock prescaler and counter period (autoreload register).  The clock rate ($T_{out}$) can be calculated for a given autoreload register (ARR), clock prescaler (PSC) and clock frequency ($F_{clk}$) as follows:
 
 <p align="center">$T_{out}={(ARR+1)(PSC+1) \over F_{clk}}$</p>
 
@@ -32,11 +32,9 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
 
 ## Configure ADC
 
-Now that we've configured the timer we need to configure the ADC controller. 
+Now that we've configured the timer we need to configure the ADC controller. We'll start by deciding which pins we want to use.  The Green Bean has five ADC's, each of which is divided into a number of channels.  Each pin has different options as to which ADC and channel it can work on.  For convenience, we'll pick two pins on the same analog controller
 
 #### 1. Enable pins
-
-We'll start by deciding which pins we want to use.  The Green Bean has five ADC's, each of which is divided into a number of channels.  Each pin has different options as to which ADC and channel it can work on.  For convenience, we'll pick two pins on the same analog controller
 
 - In the right Pinout view pane
   - Click on PC0, select ADC1_IN6 and right-click then rename to JOYX
@@ -45,17 +43,17 @@ We'll start by deciding which pins we want to use.  The Green Bean has five ADC'
 
 <p align="center"><img src="/examples/ADC/images/ADCPins.png"</p>
 
-Since the joystick we're using connects the button to GND when pressed, which is typical of most, we'll need to enable an internal pull-up resistor on the PC2 pin.  If you coming from an Arduino background this is similar to calling something line pinMode(JOYButton, INPUT_PULLUP).  We could code this manually in main.c but since we're here anyway we'll let the code generator do it for us.
+Since the joystick we're using connects the button to GND when pressed, which is typical of most, we'll need to enable an internal pull-up resistor on the PC2 pin.  If you coming from an Arduino background this is similar to calling something like **pinMode(JOYButton, INPUT_PULLUP)**.  We could code this manually in main.c but since we're here anyway we'll let the code generator do it for us.
 
 - Expand the System Core category and click on GPIO
-  - Click on PC2 and set set GPIO Pull-up/Pull-down to Pull-up
+- Click on PC2 and set set GPIO Pull-up/Pull-down to Pull-up
 
 <p align="center"><img src="/examples/ADC/images/pullup.png"</p>
 
 Each channel can be configured as either Single-Ended (where each conversion is done individually) or Differential (used to compare two different pins).  Since we are interested in obtaining individual values for the X and Y joystick, rather than compare those two values to each other, we'll set each channel to Single-Ended.
 
 - Under the Analog category click on ADC1
-  - In the Mode section change change IN6 and IN7 to Single-ended
+- In the Mode section change change IN6 and IN7 to Single-ended
 
 <p align="center"><img src="/examples/ADC/images/ADCMode.png"</p>
 
@@ -65,10 +63,10 @@ There are several options for performing ADC conversions.  In our example, we'll
 
 
   - In the Configuration section click on the DMA Settings tab
-    - Click Add
-    - Set DMA Request to ADC1
-    - Set Mode to Circular
-    - Set Memory to Byte
+  - Click Add
+  - Set DMA Request to ADC1
+  - Set Mode to Circular
+  - Set Memory to Byte
 
 <p align="center"><img src="/examples/ADC/images/DMA.png"</p>
 
@@ -79,19 +77,19 @@ Now we'll tell the ADC where to obtain the analog data, in which order we want t
 Note the order that these settings are made is important - as some options are not available until others are set
 
   - click on the parameter settings tab
-    - Set resolution to ADC 8-bit resolution
-    - Set Number of Conversion to 2
-    - Set End of Conversion Selection to End of sequence of conversion
-    - Set DMA Continuous Requests to Enabled
-    - Set External Trigger Conversion Source to Timer 2 Trigger Out Event
-    - Expand Rank 1, set channel to Channel 6 and Sampling Time to 247.5 Cycles
-    - Expand Rank 2, set channel to Channel 7 and Sampling Time to 247.5 Cycles
+  - Set resolution to ADC 8-bit resolution
+  - Set Number of Conversion to 2
+  - Set End of Conversion Selection to End of sequence of conversion
+  - Set DMA Continuous Requests to Enabled
+  - Set External Trigger Conversion Source to Timer 2 Trigger Out Event
+  - Expand Rank 1, set channel to Channel 6 and Sampling Time to 247.5 Cycles
+  - Expand Rank 2, set channel to Channel 7 and Sampling Time to 247.5 Cycles
 
 <p align="center"><img src="/examples/ADC/images/ParameterSettings.png"</p>
 
 Finally we'll wire up the shared ADC1/ADC2 global interrupt
 
- - Click on the NVIC settings tab and enable EDC1 and ADC2 global interrupt
+ - Click on the NVIC settings tab and enable ADC1 and ADC2 global interrupt
 
 <p align="center"><img src="/examples/ADC/images/interrupt.png"</p>
 
@@ -100,18 +98,18 @@ Finally we'll wire up the shared ADC1/ADC2 global interrupt
 
 Now that the timer and ADC are configured, close the .ioc file and let it auto-generate that code.  If you were to run this code now it wouldn't do much, as all we've done is setup some initial parameters and variables and had that code auto-generated.  Now we need to add some code to use these. 
 
-We'll create a buffer of size 2 (for x and y) to store the data (that's the DMA function at work).  As well as additional variables to hold the individual values.  
+We'll create a buffer of size 2 (for x and y) to store the data (that's the DMA function at work) as well as additional variables to hold the individual values.  
 
 - Open your main.c file.  If you have any code from a previous example that flashes the LED either remove or comment that out as we'll be using the LED in this example for another purpose.
 
-- In the USER CODE BEGIN PD section declare a constant.  This will be used in a few places to define how many ADC conversions we want to do and set the size for a buffer to hold that data - so it's handy to declare it in one place in case you want to change it later.
+- In the **USER CODE BEGIN PD** section declare a constant.  This will be used in a few places to define how many ADC conversions we want to do and set the size for a buffer to hold that data - so it's handy to declare it in one place in case you want to change it later.
 
 ```c
 /* USER CODE BEGIN PD */
 #define ADC_BUF_SIZE 2
 ```
 
-- In the USER CODE BEGIN PV section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use. 
+- In the **USER CODE BEGIN PV** section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use. 
 
 ```c
 /* USER CODE BEGIN PV */
@@ -119,7 +117,7 @@ uint8_t JoyX, JoyY, JoyButton;
 uint8_t AD_RES_BUFFER[ADC_BUF_SIZE];
 ```
 
-- In the USER CODE BEGIN 2 section we need to add some code to initialize the ADC and start the timer and DMA process.  We'll also set the LED to ON - this is optional but gives us a visual indication that this part of the code ran (and if it's not blinking later we know the ADC isn't working correctly).  We'll also insert a small 100ms delay after calibrating the ADC just to give it time to complete the calibration.  
+- In the **USER CODE BEGIN 2** section we need to add some code to initialize the ADC and start the timer and DMA process.  We'll also set the LED to ON - this is optional but gives us a visual indication that this part of the code ran (and if it's not blinking later we know the ADC isn't working correctly).  We'll also insert a small 100ms delay after calibrating the ADC just to give it time to complete the calibration.  
 ```c
   /* USER CODE BEGIN 2 */
   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);  			// Initialize to on
@@ -129,7 +127,7 @@ uint8_t AD_RES_BUFFER[ADC_BUF_SIZE];
   HAL_ADC_Start_DMA(&hadc1, (uint32_t *) AD_RES_BUFFER, ADC_BUF_SIZE);  // Enable DMA to memory buffer
 ```
 
-- Now we'll write a callback function for the ADC and place it in the USER CODE BEGIN 0 section.  This function will be called automatically when the ADC completes it's work.  Remember that above we set the end of conversion selection to end of sequence of conversion.  That means that once both ADC conversions are complete it'll call this function, rather than after each conversion.  Here we're just toggling the LED pin - just to give us a visual indication that it's working - and pull the variables from the buffer to individual variables to be used later.
+- Now we'll write a callback function for the ADC and place it in the **USER CODE BEGIN 0** section.  This function will be called automatically when the ADC completes it's work.  Remember that above we set the end of conversion selection to end of sequence of conversion.  That means that once both ADC conversions are complete it'll call this function, rather than after each conversion.  Here we're just toggling the LED pin - just to give us a visual indication that it's working - and pull the variables from the buffer to individual variables to be used later.
 
 ```c
 /* USER CODE BEGIN 0 */
@@ -143,7 +141,7 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 
 Note:  You'll notice that in the ConvCpltCallback function we're just storing values from the AD_RES_BUFFER into separate variables but not doing anything with them.  This is typical as you want the ADC conversion to run quickly (and repeatedly) - so don't include any logic in this function.  Its only purpose is to store the data in variables, so that we can use them later, and move on.  It does this every 200ms (per the timer we configured) so we don't want anything that takes a long time to run.  Also note that we're reading the JoyButton value here as well.  While that's not an analog conversion this seems like a reasonable place to update that variable so that we know that everything was read at the same time and we don't need to configure a separate timer to read that value.
 
-Finally we'll add some code to the main while loop to write the values to the USB.  If you already have code from a previous example that writes to the USB either delete or comment that out first, then add the following code to the USER CODE BEGIN 3 section
+Finally we'll add some code to the main while loop to write the values to the USB.  If you already have code from a previous example that writes to the USB either delete or comment that out first, then add the following code to the **USER CODE BEGIN 3** section
 
 ```c
     /* USER CODE BEGIN 3 */
@@ -178,7 +176,7 @@ As before, once your code is uploaded and running you can connect to the Green B
 
 #### Via the debugger
 
-While inspecting variables via the USB is fine, and likely very familiar with anyone coming from an Aruidno background using Serial.println, we're in the STM32 world now and there are better ways.  Let's see how we can inspect variables using the debugger
+While inspecting variables via the USB is fine, and likely very familiar to anyone coming from an Aruidno background using Serial.println, we're in the STM32 world now and there are better ways.  Let's see how we can inspect variables using the debugger
 
 - Upload and run your code using Run->Debug (instead of Run->Run)
 - When the debugger stops on the first line (typically HAL_Init()) press F8 to allow it to resume.  You should see the blue light flashing, indicating that the code is running and the ADC is working.
@@ -187,8 +185,3 @@ While inspecting variables via the USB is fine, and likely very familiar with an
 - As you move the joystick and press the button you should see the values change in that window
 
 <p align="center"><img src="/examples/ADC/images/liveexpressions.png"</p>
-
-
-
-
-
