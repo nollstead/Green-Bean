@@ -23,12 +23,12 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
   - Set Counter Period (Auto Reload Register) to 42500000-1 (note we subtract 1 since the counter starts at 0)
   - Set Trigger Event Selection TRGO to Update Event
 
-![image](/examples/ADC/images/TIM2ParameterSettings.png)
+<p align="center"><img src="/examples/ADC/images/TIM2ParameterSettings.png"</p>
 
 
   - Click on the NVIC Settings tab and check TIM2 global interrupt.
 
-![image](/examples/ADC/images/TIM2NVIC.png)
+<p align="center"><img src="/examples/ADC/images/TIM2NVIC.png"</p>
 
 
 ## Connect Joystick and Configure ADC
