@@ -4,7 +4,7 @@ Now that your Green Bean is configured it's time to write your first program.  W
 
 ## Add includes to reference required libraries
 
-Add the standard IO and USB CDC IF header references to the USER CODE BEGIN Includes section at the top of main.c.  Your code should look like this:
+Add the standard IO and USB CDC IF header references to the **USER CODE BEGIN Includes** section at the top of main.c.  Your code should look like this:
 
 ```c
 /* Private includes ----------------------------------------------------------*/
@@ -17,7 +17,7 @@ Add the standard IO and USB CDC IF header references to the USER CODE BEGIN Incl
 
 ## Declare private variables to hold data to be transmitted and length of the string
 
-Add the following code to the USER CODE BEGIN PV section
+Add the following code to the **USER CODE BEGIN PV** section
 
 ```c
 /* USER CODE BEGIN PV */
@@ -29,13 +29,13 @@ uint8_t bufLen;
 
 ## Add main logic code to flash the LED and write to the USB port every 500ms (1/2 second).
 
-Add the following code to the USER CODE BEGIN 3 section
+Add the following code to the **USER CODE BEGIN 3** section
 ```c
-    /* USER CODE BEGIN 3 */
-	  bufLen = snprintf(txBuf, 128,"Hello World\r\n");
-	  CDC_Transmit_FS((uint8_t *) txBuf, bufLen);
-	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	  HAL_Delay(500);
+  /* USER CODE BEGIN 3 */
+  bufLen = snprintf(txBuf, 128,"Hello World\r\n");
+  CDC_Transmit_FS((uint8_t *) txBuf, bufLen);
+  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+  HAL_Delay(500);
 ```
 
 Now compile and upload your code.  You should see the blue LED flashing every second.  If you connect to the serial port with a terminal emulator (such as Putty) you should see "Hello World" printed every 1/2 second.

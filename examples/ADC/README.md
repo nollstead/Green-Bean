@@ -87,7 +87,7 @@ Note that the order that these settings are made is important - as some options 
 
     ![image](/examples/ADC/images/ParameterSettings.png)
 
-Finally we'll wire up the shared ADC1/ADC2 global interrupt
+Finally we'll wire up the shared ADC1/ADC2 global interrupt, which will fire callback functions when the ADC conversion is complete.  We'll override the default callback function later in the code section.
 
  - Click on the NVIC settings tab and enable ADC1 and ADC2 global interrupt
 

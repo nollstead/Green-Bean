@@ -13,7 +13,7 @@ The nextion display communicates via a serial connection, so the first step is t
 
 ## Importing the nextion libraries
 
-To easily communicate with the Nextion we'vRe included a simple library.  Here we'll import that library into your main code.
+To easily communicate with the Nextion we've included a simple library.  Here you'll import that library into your main code.
 
 - Download the [nextion.c](/examples/Nextion/nextion.c) and [nextion.h](/examples/Nextion/nextion.h) files to your computer.  
 - Open nextion.c in a text editor and copy the contents to the clipboard
@@ -27,19 +27,19 @@ To easily communicate with the Nextion we'vRe included a simple library.  Here w
 
 Before writing to the nextion display you'll first need to include the nextion header file and initialize the library
 
-- In the USER CODE BEGIN Includes section of main.c add the following code
+- In the **USER CODE BEGIN Includes** section of main.c add the following code
 
-```c
-/* USER CODE BEGIN Includes */
-#include "nextion.h"
-```
+  ```c
+  /* USER CODE BEGIN Includes */
+  #include "nextion.h"
+  ```
 
-- In the USER CODE BEGIN 2 section of main.c, call Nextion_Init.  This just tells the library which USART to use.  Since we configured USART1 above we'll use that
+- In the **USER CODE BEGIN 2** section of main.c, call Nextion_Init.  This just tells the library which USART to use.  Since we configured USART1 above we'll use that
 
-```c
-  /* USER CODE BEGIN 2 */
-  Nextion_Init(&huart1);
-```
+  ```c
+    /* USER CODE BEGIN 2 */
+    Nextion_Init(&huart1);
+  ```
 
 ## Connect Your Nextion Display
 

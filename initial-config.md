@@ -20,7 +20,7 @@ The Green Bean includes two external crystals, a 32.768MHz low speed external cr
 - Set High Speed Clock (HSE) to Crystal\Ceramic Resonator
 - Set Low Speed Clock (LSE) to Crystal\Ceramic Resonator
 
-![image](/images/RCC.png)
+    ![image](/images/RCC.png)
 
 
 ### Configure Debugger Pins
@@ -29,9 +29,9 @@ The Green Bean includes a Tag-Connect header for uploading firmware and debuggin
 - Expand System Core then click on SYS
 - Set Debug to Trace Asynchronous Sw
 
-![image](/images/SYS.png)
+    ![image](/images/SYS.png)
 
-Note:  Technically we can get away with setting the Debug option to 'Serial Wire' but 'Trace Asynchronous Sw' also enables the Serial Wire Output (SWO) pin - which can be useful.  Since it's wired on the board we'll go ahead and choose that option.
+    Note:  Technically we can get away with setting the Debug option to 'Serial Wire' but 'Trace Asynchronous Sw' also enables the Serial Wire Output (SWO) pin - which can be useful.  Since it's wired on the board we'll go ahead and choose that option.
 
 ### Configure Real Time Clock
 While we won't likely be using the real-time clock very often, enabling it here allows us to configure the low speed crystal value later.
@@ -39,7 +39,7 @@ While we won't likely be using the real-time clock very often, enabling it here 
 - Expand Timers then click on RTC
 - Check 'Activate Clock Source'
 
-![image](/images/RTC.png)
+    ![image](/images/RTC.png)
 
 ### (Optional) Configure SPI1 Pins
 
@@ -52,7 +52,7 @@ The Green Bean includes an 8-pin SPI header.  The layout is designed for use wit
 - Set NSSP Mode to Disabled
 - Click on the NVIC Settings tab and enable SPI global interrupt
 
-![image](/images/SPI1.png)
+    ![image](/images/SPI1.png)
 
 ### (Optional) Configure USB
 
@@ -63,7 +63,7 @@ While not strictly required, we'll go ahead and enable USB support as a full spe
 - Expand 'Middleware and Software Packs' then click on USB_DEVICE
 - set Class For FS IP to 'Communication Device Class (Virtual Port Com)'
 
-![image](/images/USBVCP.png)
+    ![image](/images/USBVCP.png)
 
 ## Pinout
 
@@ -83,7 +83,7 @@ Now that the main basic components have been configured, you'll see those pins s
 - Right-Click on PB9, select 'Enter User Label' and rename to IRQ
 
 
-![image](/images/pinout.png)
+    ![image](/images/pinout.png)
 
 
 ## Clock Configuration
@@ -100,9 +100,9 @@ As mentioned above, the Green Bean includes two crystals, one for the low speed 
 - Set CK48 Clock Mux to HSI48
 - Set HCLK to 170MHZ
 
-Note:  You may notice that we're using the internal resonator to drive the USB instead of the PLLQ.  The reason is that we chose the 25MHz high speed crystal value so that we could achieve the highest possible system speed (170MHz), however, USB needs to run at 48MHz and there is no combination that will start at 25MHz and reach 48MHz.  
+    ![image](/images/Clock.png)
 
-![image](/images/Clock.png)
+    Note:  You may notice that we're using the internal resonator to drive the USB instead of the PLLQ.  The reason is that we chose the 25MHz high speed crystal value so that we could achieve the highest possible system speed (170MHz), however, USB needs to run at 48MHz and there is no combination that will start at 25MHz and reach 48MHz.  
 
 Click save and the IDE will take the configuration changes you've set and generate the required code for you.  At this point your Green Bean project is setup with the basics needed to start coding
 
