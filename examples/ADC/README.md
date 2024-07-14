@@ -50,7 +50,7 @@ Since the joystick we're using connects the button to GND when pressed, which is
 - Expand the System Core category and click on GPIO
   - Click on PC2 and set set GPIO Pull-up/Pull-down to Pull-up
 
-![image](/examples/ADC/images/pullup.png)
+<p align="center"><img src="/examples/ADC/images/pullup.png"</p>
 
 Each channel can be configured as either Single-Ended (where each conversion is done individually) or Differential (used to compare two different pins).  Since we are interested in obtaining individual values for the X and Y joystick, rather than compare those two values to each other, we'll set each channel to Single-Ended.
 
@@ -70,7 +70,7 @@ There are several options for performing ADC conversions.  In our example, we'll
     - Set Mode to Circular
     - Set Memory to Byte
 
-![image](/examples/ADC/images/DMA.png)
+<p align="center"><img src="/examples/ADC/images/DMA.png"</p>
 
 #### 3. Configure ADC Parameters
 
@@ -87,14 +87,13 @@ Note the order that these settings are made is important - as some options are n
     - Expand Rank 1, set channel to Channel 6 and Sampling Time to 247.5 Cycles
     - Expand Rank 2, set channel to Channel 7 and Sampling Time to 247.5 Cycles
 
-![image](/examples/adc/images/ParameterSettings.png)
+<p align="center"><img src="/examples/ADC/images/ParameterSettings.png"</p>
 
 Finally we'll wire up the shared ADC1/ADC2 global interrupt
 
  - Click on the NVIC settings tab and enable EDC1 and ADC2 global interrupt
 
-![image](/examples/adc/images/interrupt.png)
-
+<p align="center"><img src="/examples/ADC/images/interrupt.png"</p>
 
 
 ## Code
@@ -144,6 +143,15 @@ void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc) {
 
 Note:  You'll notice that in the ConvCpltCallback function we're just storing values from the AD_RES_BUFFER into separate variables but not doing anything with them.  This is typical as you want the ADC conversion to run quickly (and repeatedly) - so don't include any logic in this function.  Its only purpose is to store the data in variables, so that we can use them later, and move on.  It does this every 200ms (per the timer we configured) so we don't want anything that takes a long time to run.  Also note that we're reading the JoyButton value here as well.  While that's not an analog conversion this seems like a reasonable place to update that variable so that we know that everything was read at the same time and we don't need to configure a separate timer to read that value.
 
+Finally we'll add some code to the main while loop to write the values to the USB.  If you already have code from a previous example that writes to the USB either delete or comment that out first, then add the following code to the USER CODE BEGIN 3 section
+
+```c
+    /* USER CODE BEGIN 3 */
+	  bufLen = snprintf(txBuf, 128, "JoyX:  %d\tJoyY: %d\tJoyButton: %d\r\n", JoyX, JoyY, JoyButton);
+	  CDC_Transmit_FS((uint8_t *) txBuf, bufLen);
+	  HAL_Delay(500);
+```
+
 ## Connect joystick
 
 Now we can connect our joystick according to the pins we configured above.  Wire in the joystick as follows (note that while the joystick we're using lists the power pin as +5V, our green bean natively runs at 3.3v - so we'll use that)
@@ -157,6 +165,29 @@ Now we can connect our joystick according to the pins we configured above.  Wire
 | GND          | GND                   |
 
 ## Test
+
+If you upload and run your code now you should see the blue light flashing about every 2.5 times a second.  If the blue light is on then you likely have a configuration issue with the ADC, so review the steps above to be sure you haven't missed anything in that section.
+
+Now it's time to check the conversion and read the values.  We'll do this two ways: via the USB and 
+
+#### Via USB
+
+As before, once your code is uploaded and running you can connect to the Green Bean using a terminal emulator such as PuTTY.  You should see the joystick values printed every 1/2 second. 
+
+<p align="center"><img src="/examples/ADC/images/USBOutput.png"</p>
+
+#### Via the debugger
+
+While inspecting variables via the USB is fine, and likely very familiar with anyone coming from an Aruidno background using Serial.println, we're in the STM32 world now and there are better ways.  Let's see how we can inspect variables using the debugger
+
+- Upload and run your code using Run->Debug (instead of Run->Run)
+- When the debugger stops on the first line (typically HAL_Init()) press F8 to allow it to resume.  You should see the blue light flashing, indicating that the code is running and the ADC is working.
+- In the debug window look for a tab called Live Expressions.  Note that you may need to enable this in the IDE options if it's not there
+- Click on Add new expression and add in the JoyX, JoyY and JoyButton variables
+- As you move the joystick and press the button you should see the values change in that window
+
+<p align="center"><img src="/examples/ADC/images/liveexpressions.png"</p>
+
 
 
 
