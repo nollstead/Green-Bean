@@ -10,7 +10,7 @@ When we [setup the green bean](/initial-config.md) we set the main system clock 
 
 <p align="center">$T_{out}={(ARR+1)(PSC+1) \over F_{clk}}$</p>
 
- Since Timer2 has a 32-bit autoreload register it can hold a big value, we'll use that and make our calculation a bit easier and set the prescaler to 0.  Substituting 0.2 seconds for $T_{out}, 0 for PSC and 170MHz for $F_{clk}$ we can rearrange the equation and solve for ARR to get 42,500,000
+ Since Timer2 has a 32-bit autoreload register it can hold a big value, we'll use that and make our calculation a bit easier and set the prescaler to 0.  Substituting 0.2 seconds for $T_{out}$, 0 for PSC and 170MHz for $F_{clk}$ we can rearrange the equation and solve for ARR to get 42,500,000
 
 - In STM32CubeIDE open your .ioc file, go to the Timers category and select TIM2
 - In the Mode section set Clock Source to Internal Clock
@@ -76,7 +76,7 @@ Now we'll tell the ADC where to obtain the analog data, in which order we want t
 
 Note that the order that these settings are made is important - as some options are not available until others are set
 
-  - click on the parameter settings tab
+  - Click on the parameter settings tab
   - Set resolution to ADC 8-bit resolution
   - Set Number of Conversion to 2
   - Set End of Conversion Selection to End of sequence of conversion
