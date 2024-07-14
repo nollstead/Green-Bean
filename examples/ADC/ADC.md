@@ -15,17 +15,27 @@ When we setup the green bean we set the main system clock to the maximum 170MHz,
 - In STM32CubeIDE open your .ioc file, go to the Timers section and select TIM2
 - In the Mode section
   - Set Clock Source to Internal Clock
-- In the Configuration section
+
+<p align="center"><img src="/examples/ADC/images/TIM2ClockSource.png"</p>
+
+- In the Configuration section on the Parameter Settings tab
   - Set Prescaler to 0
   - Set Counter Period (Auto Reload Register) to 42500000-1 (note we subtract 1 since the counter starts at 0)
   - Set Trigger Event Selection TRGO to Update Event
-  - Click on NVIC Settings and check TIM2 global interrupt.
+
+![image](/examples/ADC/images/TIM2ParameterSettings.png)
+
+
+  - Click on the NVIC Settings tab and check TIM2 global interrupt.
+
+![image](/examples/ADC/images/TIM2NVIC.png)
+
 
 ## Connect Joystick and Configure ADC
 
 Now that we've configured the timer we'll decide which ports we want to configure for the joystick.  We'll pick two pins on the same analog controller and one digital pin.
 
-- In thr right Pinout view pane
+- In the right Pinout view pane
   - Click on PC0, select ADC1_IN6 and right-click then rename to JOYX
   - Click on PC1, select ADC1_IN7 and right-click then rename to JOYY
   - Click on PC2, select GPIO_Output and right-click then rename to JOYButton
