@@ -13,26 +13,24 @@ When we [setup the green bean](/initial-config.md) we set the main system clock 
  Since Timer2 has a 32-bit autoreload register it can hold a big value, we'll use that and make our calculation a bit easier and set the prescaler to 0.  Substituting 0.2 seconds for $T_{out}, 0 for PSC and 170MHz for $F_{clk}$ we can rearrange the equation and solve for ARR to get 42,500,000
 
 - In STM32CubeIDE open your .ioc file, go to the Timers category and select TIM2
-- In the Mode section
-  - Set Clock Source to Internal Clock
+- In the Mode section set Clock Source to Internal Clock
 
-<p align="center"><img src="/examples/ADC/images/TIM2ClockSource.png"</p>
+    ![image](/examples/ADC/images/TIM2ClockSource.png)
 
 - In the Configuration section on the Parameter Settings tab
   - Set Prescaler to 0
   - Set Counter Period (AutoReload Register) to 42500000-1 (note we subtract 1 since the counter starts at 0)
   - Set Trigger Event Selection TRGO to Update Event
 
-<p align="center"><img src="/examples/ADC/images/TIM2ParameterSettings.png"</p>
-
+    ![image](/examples/ADC/images/TIM2ParameterSettings.png)
 
   - Click on the NVIC Settings tab and check TIM2 global interrupt.
 
-<p align="center"><img src="/examples/ADC/images/TIM2NVIC.png"</p>
+    ![image](/examples/ADC/images/TIM2NVIC.png)
 
 ## Configure ADC
 
-Now that we've configured the timer we need to configure the ADC controller. We'll start by deciding which pins we want to use.  The Green Bean has five ADC's, each of which is divided into a number of channels.  Each pin has different options as to which ADC and channel it can work on.  For convenience, we'll pick two pins on the same analog controller
+Now that we've configured the timer we need to configure the ADC controller. We'll start by deciding which pins we want to use.  The Green Bean has five ADC's, each of which is divided into a number of channels.  Each pin has different options as to which ADC and channel it can work on.  For convenience, we'll pick two pins on the same analog controller.
 
 #### 1. Enable pins
 
@@ -41,21 +39,23 @@ Now that we've configured the timer we need to configure the ADC controller. We'
   - Click on PC1, select ADC1_IN7 and right-click then rename to JOYY
   - Click on PC2, select GPIO_Input and right-click then rename to JOYButton
 
-<p align="center"><img src="/examples/ADC/images/ADCPins.png"</p>
+   Note that these are case sensitive, be sure to use the same capitalization as above to match the code sections below.
+
+    ![image](/examples/ADC/images/ADCPins.png)
 
 Since the joystick we're using connects the button to GND when pressed, which is typical of most, we'll need to enable an internal pull-up resistor on the PC2 pin.  If you coming from an Arduino background this is similar to calling something like **pinMode(JOYButton, INPUT_PULLUP)**.  We could code this manually in main.c but since we're here anyway we'll let the code generator do it for us.
 
 - Expand the System Core category and click on GPIO
 - Click on PC2 and set set GPIO Pull-up/Pull-down to Pull-up
 
-<p align="center"><img src="/examples/ADC/images/pullup.png"</p>
+    ![image](/examples/ADC/images/pullup.png)
 
 Each channel can be configured as either Single-Ended (where each conversion is done individually) or Differential (used to compare two different pins).  Since we are interested in obtaining individual values for the X and Y joystick, rather than compare those two values to each other, we'll set each channel to Single-Ended.
 
 - Under the Analog category click on ADC1
 - In the Mode section change change IN6 and IN7 to Single-ended
 
-<p align="center"><img src="/examples/ADC/images/ADCMode.png"</p>
+    ![image](/examples/ADC/images/ADCMode.png)
 
 #### 2. Configure DMA
 
@@ -68,7 +68,7 @@ There are several options for performing ADC conversions.  In our example, we'll
   - Set Mode to Circular
   - Set Memory to Byte
 
-<p align="center"><img src="/examples/ADC/images/DMA.png"</p>
+    ![image](/examples/ADC/images/DMA.png)
 
 #### 3. Configure ADC Parameters
 
@@ -85,14 +85,13 @@ Note the order that these settings are made is important - as some options are n
   - Expand Rank 1, set channel to Channel 6 and Sampling Time to 247.5 Cycles
   - Expand Rank 2, set channel to Channel 7 and Sampling Time to 247.5 Cycles
 
-<p align="center"><img src="/examples/ADC/images/ParameterSettings.png"</p>
+    ![image](/examples/ADC/images/ParameterSettings.png)
 
 Finally we'll wire up the shared ADC1/ADC2 global interrupt
 
  - Click on the NVIC settings tab and enable ADC1 and ADC2 global interrupt
 
-<p align="center"><img src="/examples/ADC/images/interrupt.png"</p>
-
+    ![image](/examples/ADC/images/interrupt.png)
 
 ## Code
 
@@ -172,7 +171,7 @@ Now it's time to check the conversion and read the values.  We'll do this two wa
 
 As before, once your code is uploaded and running you can connect to the Green Bean using a terminal emulator such as PuTTY.  You should see the joystick values printed every 1/2 second. 
 
-<p align="center"><img src="/examples/ADC/images/USBOutput.png"</p>
+    ![image](/examples/ADC/images/USBOutput.png)
 
 #### Via the debugger
 
@@ -184,4 +183,4 @@ While inspecting variables via the USB is fine, and likely very familiar to anyo
 - Click on Add new expression and add in the JoyX, JoyY and JoyButton variables
 - As you move the joystick and press the button you should see the values change in that window
 
-<p align="center"><img src="/examples/ADC/images/liveexpressions.png"</p>
+    ![image](/examples/ADC/images/liveexpressions.png)
