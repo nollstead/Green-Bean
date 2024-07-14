@@ -28,7 +28,7 @@ The Green Bean is a breakout board based on the STM32G473RCT6 microcontroller.  
 - I2C:    Mirrored on 4-pin header and Qwiic connector
 - SPI:    Available on 8-pin header
 - Infrared (IR) Out: 
-- Serial Wire Debugger (SWD) via pads for a tag-connect TC2030-IDC-NL adapter.  
+- Serial Wire Debugger (SWD) via pads for a tag-connect [TC2030-IDC-NL](https://www.tag-connect.com/product/tc2030-idc-nl) adapter.  
 
 
 ## Getting Started
