@@ -17,7 +17,6 @@ The steps to upload your code using DFU are as follows:
 3.  Identify USB virtual comport in device manager.  
 4.  Upload code using the [STM32CubeProgrammer](https://www.st.com/en/development-tools/stm32cubeprog.html) utility.
 
-
 ## Serial Wire Debug (SWD)   
 
 A more powerful, albeit more expensive, method is to upload your code via the IDE using Serial Wire Debug (SWD).  The Green Bean comes configured with a SWD port, allowing an external debugger to be easily attached and detached as needed.  Using SWD has the additional benefit of not only allowing you to upload your code but debug as well - all within the STM32CubeIDE

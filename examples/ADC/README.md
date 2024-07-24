@@ -106,12 +106,12 @@ Now that the timer and ADC are configured, close the .ioc file and let it auto-g
   #define ADC_BUF_SIZE 2
   ```
 
-- In the **USER CODE BEGIN PV** section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use. 
+- In the **USER CODE BEGIN PV** section declare four private variables.  One is the buffer that the DMA will use to transfer converted analog values and the other three will be where we store those variables for later use. Note we're adding the volatile qualifier to prevent compiler optimizations from potentially interfering with the values.
 
   ```c
   /* USER CODE BEGIN PV */
-  uint8_t JoyX, JoyY, JoyButton;
-  uint8_t AD_RES_BUFFER[ADC_BUF_SIZE];
+  volatile uint8_t JoyX, JoyY, JoyButton;
+  volatile uint8_t AD_RES_BUFFER[ADC_BUF_SIZE];
   ```
 
 - In the **USER CODE BEGIN 2** section we need to add some code to initialize the ADC and start the timer and DMA process.  We'll also set the LED to ON - this is optional but gives us a visual indication that this part of the code ran (and if it's not blinking later we know the ADC isn't working correctly).  We'll also insert a small 100ms delay after calibrating the ADC just to give it time to complete the calibration.  

@@ -1,0 +1,17 @@
+# Debugging using Serial Wire Viewer
+
+
+Add the following code to the **USER CODE BEGIN 0** section of main.c (just before main).  
+```c
+/**
+ * For SWD debug output printing - testing
+ */
+int _write(int32_t file, uint8_t *ptr, int32_t len)
+{
+    for (int i = 0; i < len; i++)
+    {
+        ITM_SendChar(*ptr++);
+    }
+    return len;
+}
+```
